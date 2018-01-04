@@ -1,0 +1,17 @@
+keystone_username: XXXXXXXX
+keystone_password: XXXXXXXX
+keystone_tenant_name: XXXXXXXX
+keystone_url: https://IP_ADDRESS:5000/v2.0
+keystone_region: RegionOne
+external_network_name: XXXXXXXX
+examples_centos_core_image_id: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+examples_ubuntu_trusty_image_id: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+
+example_network_id: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+example_network_cidr: 10.0.0.0/16
+example_subnet_id_a: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+example_subnet_cidr_a: 10.10.0.0/24
+example_subnet_zone_a: N/A
+example_subnet_id_b: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+example_subnet_cidr_b: 10.10.1.0/24
+example_subnet_zone_b: N/A

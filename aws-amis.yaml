@@ -1,0 +1,66 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+- http://www.getcloudify.org/spec/cloudify/4.2/types.yaml
+- http://www.getcloudify.org/spec/awssdk-plugin/1.2.0.1/plugin.yaml
+- imports/types.yaml
+
+dsl_definitions:
+
+  aws_config: &aws_config
+    aws_access_key_id: { get_secret: aws_access_key_id }
+    aws_secret_access_key: { get_secret: aws_secret_access_key }
+    region_name: { get_secret: ec2_region_name }
+
+node_templates:
+
+  aws_manager_configuration_images:
+    type: cloudify.nodes.Manager.Configuration
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure:
+          implementation: scripts/configure.py
+          executor: central_deployment_agent
+          inputs:
+            secrets:
+              ExamplesCentosCoreImage: { get_attribute: [ centos_core_ami, aws_resource_id ] }
+              ExamplesUbuntuTrustyImage: { get_attribute: [ ubuntu_trusty_ami, aws_resource_id ] }
+    relationships:
+    - type: cloudify.relationships.depends_on
+      target: centos_core_ami
+    - type: cloudify.relationships.depends_on
+      target: ubuntu_trusty_ami
+
+  centos_core_ami:
+    type: cloudify.nodes.aws.ec2.Image
+    properties:
+      resource_config:
+        kwargs:
+          Filters:
+          - Name: name
+            Values:
+            - 'CentOS 7.3.1611 x86_64 with cloud-init (HVM)'
+          - Name: owner-id
+            Values:
+            - '057448758665'
+      client_config: *aws_config
+
+  ubuntu_trusty_ami:
+    type: cloudify.nodes.aws.ec2.Image
+    properties:
+      resource_config:
+        kwargs:
+          Filters:
+          - Name: name
+            Values:
+            - 'ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20170727'
+          - Name: owner-id
+            Values:
+            - '099720109477'
+      client_config: *aws_config
+
+inputs:
+
+  example_tenant_name:
+    type: string
+    default: example_tenant

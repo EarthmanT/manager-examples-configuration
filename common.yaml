@@ -1,0 +1,72 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+- http://www.getcloudify.org/spec/cloudify/4.2/types.yaml
+- imports/types.yaml
+
+node_templates:
+
+  common_manager_configuration:
+    type: cloudify.nodes.Manager.Configuration
+    properties:
+      plugins: { get_input: plugin_urls }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure:
+          implementation: scripts/configure.py
+          executor: central_deployment_agent
+          inputs:
+            secrets:
+              ExampleNetworkID: { get_input: example_network_id }
+              ExampleNetworkCIDR: { get_input: example_network_cidr }
+              ExampleSubnetAID: { get_input: example_subnet_id_a }
+              ExampleSubnetACIDR: { get_input: example_subnet_cidr_a }
+              ExampleSubnetAZone: { get_input: example_subnet_zone_a }
+              ExampleSubnetBID: { get_input: example_subnet_id_b }
+              ExampleSubnetBCIDR: { get_input: example_subnet_cidr_b }
+              ExampleSubnetBZone: { get_input: example_subnet_zone_b }
+
+inputs:
+
+  plugin_urls:
+    default:
+    - http://repository.cloudifysource.org/cloudify/wagons/cloudify-fabric-plugin/1.5.1/cloudify_fabric_plugin-1.5.1-py27-none-linux_x86_64-centos-Core.wgn
+    - http://repository.cloudifysource.org/cloudify/wagons/cloudify-diamond-plugin/1.3.6/cloudify_diamond_plugin-1.3.6-py27-none-linux_x86_64-Ubuntu-trusty.wgn
+    - https://github.com/cloudify-incubator/cloudify-kubernetes-plugin/releases/download/2.0.0/cloudify_kubernetes_plugin-2.0.0-py27-none-linux_x86_64-centos-Core.wgn
+    - http://repository.cloudifysource.org/cloudify/wagons/cloudify-utilities-plugin/1.4.2.1/cloudify_utilities_plugin-1.4.2.1-py27-none-linux_x86_64-centos-Core.wgn
+
+  example_tenant_name:
+    type: string
+    default: example_tenant
+
+  example_network_id:
+    type: string
+    default: ''
+
+  example_network_cidr:
+    type: string
+    default: ''
+
+  example_subnet_id_a:
+    type: string
+    default: ''
+
+  example_subnet_cidr_a:
+    type: string
+    default: ''
+
+  example_subnet_zone_a:
+    type: string
+    default: ''
+
+  example_subnet_id_b:
+    type: string
+    default: { get_input: example_subnet_id_a }
+
+  example_subnet_cidr_b:
+    type: string
+    default: { get_input: example_subnet_cidr_a }
+
+  example_subnet_zone_b:
+    type: string
+    default: { get_input: example_subnet_zone_a }

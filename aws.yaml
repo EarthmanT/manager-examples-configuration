@@ -1,0 +1,56 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+- common.yaml
+
+node_templates:
+
+  aws_manager_configuration:
+    type: cloudify.nodes.Manager.Configuration
+    properties:
+      plugins: { get_input: aws_plugin_urls }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure:
+          implementation: scripts/configure.py
+          executor: central_deployment_agent
+          inputs:
+            secrets:
+              aws_access_key_id: { get_input: aws_access_key_id }
+              aws_secret_access_key: { get_input: aws_secret_access_key }
+              ec2_region_name: { get_input: ec2_region_name }
+              ec2_region_endpoint: { get_input: ec2_region_endpoint }
+              ExamplesSmallImageSize: { get_input: examples_small_size }
+              ExamplesMediumImageSize: { get_input: examples_medium_size }
+              ExamplesLargeImageSize: { get_input: examples_large_size }
+
+inputs:
+
+  aws_plugin_urls:
+    default:
+    - https://github.com/cloudify-cosmo/cloudify-aws-plugin/releases/download/1.5.1.2/cloudify_aws_plugin-1.5.1.2-py27-none-linux_x86_64-centos-Core.wgn
+    - http://repository.cloudifysource.org/cloudify/wagons/cloudify-awssdk-plugin/1.2.0.1/cloudify_awssdk_plugin-1.2.0.1-py27-none-linux_x86_64-centos-Core.wgn
+
+  aws_access_key_id:
+    type: string
+
+  aws_secret_access_key:
+    type: string
+
+  ec2_region_name:
+    type: string
+
+  ec2_region_endpoint:
+    type: string
+
+  examples_small_size:
+    type: string
+    default: t2.micro
+
+  examples_medium_size:
+    type: string
+    default: t2.medium
+
+  examples_large_size:
+    type: string
+    default: m3.large

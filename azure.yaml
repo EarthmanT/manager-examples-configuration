@@ -1,0 +1,95 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+- common.yaml
+
+node_templates:
+
+  azure_manager_configuration:
+    type: cloudify.nodes.Manager.Configuration
+    properties:
+      plugins: { get_input: azure_plugin_urls }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure:
+          implementation: scripts/configure.py
+          executor: central_deployment_agent
+          inputs:
+            secrets:
+              subscription_id: { get_input: subscription_id }
+              tenant_id: { get_input: tenant_id }
+              client_id: { get_input: client_id }
+              client_secret: { get_input: client_secret }
+              location: { get_input: location }
+              ExamplesSmallImageSize: { get_input: examples_small_size }
+              ExamplesMediumImageSize: { get_input: examples_medium_size }
+              ExamplesLargeImageSize: { get_input: examples_large_size }
+              ExamplesCentosCorePublisher: { get_input: centos_core_image_publisher }
+              ExamplesCentosCoreOffer: { get_input: centos_core_image_offer }
+              ExamplesCentosCoreSKU: { get_input: centos_core_image_sku }
+              ExamplesCentosCoreVersion: { get_input: centos_core_image_version }
+              ExamplesUbuntuTrustyPublisher: { get_input: ubuntu_trusty_image_publisher }
+              ExamplesUbuntuTrustyOffer: { get_input: ubuntu_trusty_image_offer }
+              ExamplesUbuntuTrustySKU: { get_input: ubuntu_trusty_image_sku }
+              ExamplesUbuntuTrustyVersion: { get_input: ubuntu_trusty_image_version }
+              ExamplesResourceGroup: { get_input: examples_resource_group }
+
+inputs:
+
+  azure_plugin_urls:
+    default:
+    - https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/1.4.3/cloudify_azure_plugin-1.4.3-py27-none-linux_x86_64-centos-Core.wgn
+
+  subscription_id:
+    type: string
+
+  tenant_id:
+    type: string
+
+  client_id:
+    type: string
+
+  client_secret:
+    type: string
+
+  location:
+    type: string
+
+  examples_small_size:
+    type: string
+    default: Standard_A0
+
+  examples_medium_size:
+    type: string
+    default: Standard_A2
+
+  examples_large_size:
+    type: string
+    default: Standard_A4
+
+  centos_core_image_publisher:
+    default: OpenLogic
+
+  centos_core_image_offer:
+    default: CentOS
+
+  centos_core_image_sku:
+    default: '7.3'
+
+  centos_core_image_version:
+    default: latest
+
+  ubuntu_trusty_image_publisher:
+    default: Canonical
+
+  ubuntu_trusty_image_offer:
+    default: UbuntuServer
+
+  ubuntu_trusty_image_sku:
+    default: 14.04.4-LTS
+
+  ubuntu_trusty_image_version:
+    default: 14.04.201604060
+
+  examples_resource_group:
+    type: string
