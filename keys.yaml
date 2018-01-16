@@ -7,10 +7,6 @@ imports:
 
 inputs:
 
-  example_tenant_name:
-    type: string
-    default: example_tenant
-
   agent_key_name:
     type: string
     default: agent_key
@@ -18,6 +14,11 @@ inputs:
   local_ssh_directory:
     type: string
     default: '~/.ssh'
+
+
+  example_tenant_name:
+    type: string
+    default: 'default_tenant'
 
 node_templates:
 

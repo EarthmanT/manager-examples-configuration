@@ -8,6 +8,10 @@ from requests.exceptions import ConnectionError
 from cloudify.manager import get_rest_client
 
 
+class SecretNotFoundError(Exception):
+    pass
+
+
 def check_api(client_callable, arguments=None, _progress_handler=None):
     """ Check for API Response and handle generically. """
 
@@ -26,6 +30,10 @@ def check_api(client_callable, arguments=None, _progress_handler=None):
     except CloudifyClientError as e:
         if e.status_code == 502:
             raise OperationRetry('Retrying after error: {0}'.format(str(e)))
+
+        if e.status_code == 404:
+            raise SecretNotFoundError('Not Found error {0}'.format(str(e)))
+
         else:
             ctx.logger.error('Ignoring error: {0}'.format(str(e)))
     else:
@@ -67,10 +75,19 @@ if __name__ == '__main__':
         ks = ctx.instance.runtime_properties.get('secret_keys', [])
         ks.append(secret_key)
         ctx.instance.runtime_properties['secret_keys'] = ks
-        new_secret = check_api(
-            client.secrets.create,
-            arguments={'key': secret_key, 'value': examples_secrets[secret_key]})
-        if new_secret is None:
-            check_api(
-                client.secrets.update,
-                arguments={'key': secret_key, 'value': examples_secrets[secret_key]})
+        secret = None
+        try:
+            secret = check_api(client.secrets.get,
+                               arguments={'key': secret_key})
+            if secret:
+                check_api(
+                    client.secrets.update,
+                    arguments={'key': secret_key,
+                               'value': examples_secrets[secret_key]})
+
+        except SecretNotFoundError:
+            new_secret = check_api(
+                client.secrets.create,
+                arguments={'key': secret_key,
+                           'value': examples_secrets[secret_key]})
+
